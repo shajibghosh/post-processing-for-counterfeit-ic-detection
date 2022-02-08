@@ -1,6 +1,13 @@
 from plantcv import plantcv as pcv
 import cv2
 import matplotlib.pyplot as plt
+import shutil
+
+shutil.rmtree('source_matrix.npz', ignore_errors=True)
+shutil.rmtree('target_matrix.npz', ignore_errors=True)
+shutil.rmtree('transformation_matrix.npz', ignore_errors=True)
+shutil.rmtree('Color-corrected-test-sample-image.png', ignore_errors=True)
+
 class options:
     def __init__(self):
         self.debug = "plot"

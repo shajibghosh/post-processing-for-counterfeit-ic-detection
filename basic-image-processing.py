@@ -2,20 +2,26 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import os
+import shutil
 from scipy import ndimage
 from skimage.filters import threshold_otsu
 import scipy
 
 debug = True
 
+shutil.rmtree('outputs', ignore_errors=True)
+
+output_folder = "./outputs" 
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
 
 #Plotting different histograms
-def plothist(fnamePath, fnameList, method, numBins=32):
+def plothist(fnamePath, fnameList, method):
     plt.figure()
     for fname in fnameList:
         img = eval(method)
-        hist, bin_edges = np.histogram(img.flatten(), bins=numBins)
-        plt.plot(bin_edges[0:-1], hist/hist.sum())
+        hist, bin_edges = np.histogram(img.ravel(),256,[0,255])
+        plt.plot(hist)
     plt.legend(fnames)
 
 #grayscale conversion
@@ -40,6 +46,7 @@ def edgeDetection(fnamePath, fnameList):
         plt.title('Original Image' + '(' + str(fname.split('.png')[0]) + ')'), plt.xticks([]), plt.yticks([])
         plt.subplot(122),plt.imshow(edges,cmap = 'gray')
         plt.title('Edge Image' + '(' + str(fname.split('.png')[0]) + ')'), plt.xticks([]), plt.yticks([])
+        plt.savefig('./outputs/edge_detection' + '_' + str(fname.split('.png')[0]) + '.png')
         plt.show()
 
 #thresholding(Otsu's method)
@@ -61,10 +68,13 @@ def getThreshold(fnamePath, fnameList):
         ax[1].hist(img.ravel(), bins=256)
         ax[1].set_title('Histogram' + '(' + str(fname.split('.png')[0]) + ')')
         ax[1].axvline(thresh, color='r')
+        ax[1].set_xlabel('Grayscale values')
+        ax[1].set_ylabel('Pixel counts')
 
         ax[2].imshow(binary, cmap=plt.cm.gray)
         ax[2].set_title('Thresholded' + '(' + str(fname.split('.png')[0]) + ')')
         ax[2].axis('off')
+        plt.savefig('./outputs/thresholding' + '_' + str(fname.split('.png')[0]) + '.png')
         plt.show()
         
 
@@ -74,11 +84,18 @@ fnames = [fname for fname in os.listdir(imgPath)]
 method_0 = 'readImgAsGray(fnamePath, fname)'
 plothist(imgPath, fnames, method_0)
 plt.title('Histogram of Grayscale Values')
+plt.xlabel('Grayscale values')
+plt.ylabel('Pixel counts')
+plt.savefig('./outputs/histogram_grayscale.png', dpi=300)
 plt.show()
+
 
 method_1 = 'getMedFilteredImg(fnamePath, fname)'
 plothist(imgPath, fnames, method_1)
 plt.title('Histogram of Median Filtered Image')
+plt.xlabel('Grayscale values')
+plt.ylabel('Pixel counts')
+plt.savefig('./outputs/histogram_median_filtered.png', dpi=300)
 plt.show()
 
 getThreshold(imgPath, fnames)
